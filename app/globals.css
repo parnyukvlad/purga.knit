@@ -74,3 +74,27 @@ body {
   background-size: 20px 20px;
   pointer-events: none;
 }
+
+/* Input placeholder styles - make them readable */
+input::placeholder {
+  color: rgba(245, 245, 220, 0.4) !important;
+  opacity: 1;
+}
+
+input::-webkit-input-placeholder {
+  color: rgba(245, 245, 220, 0.4) !important;
+}
+
+input::-moz-placeholder {
+  color: rgba(245, 245, 220, 0.4) !important;
+  opacity: 1;
+}
+
+input:-ms-input-placeholder {
+  color: rgba(245, 245, 220, 0.4) !important;
+}
+
+input:-moz-placeholder {
+  color: rgba(245, 245, 220, 0.4) !important;
+  opacity: 1;
+}

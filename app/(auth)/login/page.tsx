@@ -39,20 +39,20 @@ export default function LoginPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-gray-50 py-12">
+      <main className="min-h-screen bg-[#0a0a0a] py-12">
         <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h1 className="text-2xl font-bold text-gray-900 mb-6">Login</h1>
+          <div className="bg-[#1a1a1a] border border-[#8B0000]/20 rounded-lg shadow-md p-8">
+            <h1 className="text-3xl font-bold text-[#8B0000] mb-6 font-serif italic">Login</h1>
             
             {error && (
-              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-                <p className="text-sm text-red-600">{error}</p>
+              <div className="mb-4 p-3 bg-[#8B0000]/20 border border-[#8B0000] rounded-md">
+                <p className="text-sm text-[#8B0000] font-serif">{error}</p>
               </div>
             )}
 
             <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="email" className="block text-sm font-medium text-[#F5F5DC] mb-1 font-serif">
                   Email
                 </label>
                 <input
@@ -61,12 +61,13 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
+                  placeholder="your.email@example.com"
+                  className="w-full px-3 py-2 bg-[#0a0a0a] border border-[#8B0000]/30 text-[#F5F5DC] rounded-md focus:outline-none focus:ring-2 focus:ring-[#8B0000] placeholder:text-[#F5F5DC]/40"
                 />
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="password" className="block text-sm font-medium text-[#F5F5DC] mb-1 font-serif">
                   Password
                 </label>
                 <input
@@ -75,23 +76,24 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
+                  placeholder="Enter your password"
+                  className="w-full px-3 py-2 bg-[#0a0a0a] border border-[#8B0000]/30 text-[#F5F5DC] rounded-md focus:outline-none focus:ring-2 focus:ring-[#8B0000] placeholder:text-[#F5F5DC]/40"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gray-900 text-white py-2 px-4 rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-[#8B0000] text-[#F5F5DC] py-2 px-4 rounded-md hover:bg-[#5C0000] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-serif"
               >
                 {loading ? 'Logging in...' : 'Login'}
               </button>
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-[#F5F5DC]/70 font-serif">
                 Don&apos;t have an account?{' '}
-                <Link href="/signup" className="text-gray-900 font-medium hover:underline">
+                <Link href="/signup" className="text-[#8B0000] font-medium hover:text-[#5C0000] transition-colors">
                   Sign up
                 </Link>
               </p>
