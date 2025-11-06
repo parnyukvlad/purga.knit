@@ -23,13 +23,12 @@ export default function SignupPage() {
     setSuccess(false)
 
     try {
-      // Проверяем подключение к Supabase
-      const { data: testData, error: testError } = await supabase.from('purgaknit_categories').select('id').limit(1)
-      if (testError && !testError.message.includes('permission')) {
-        console.error('Supabase connection error:', testError)
-        setError('Cannot connect to database. Please check your connection.')
-        setLoading(false)
-        return
+      // Проверяем базовое подключение к Supabase (проверка URL и ключа)
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      
+      if (!supabaseUrl || !supabaseKey) {
+        console.warn('Supabase environment variables not set, using defaults')
       }
 
       const { data, error: signUpError } = await supabase.auth.signUp({
@@ -43,10 +42,13 @@ export default function SignupPage() {
         },
       })
 
-      // Если есть ошибка, выбрасываем её
+      // Если есть ошибка, обрабатываем её
       if (signUpError) {
+        console.error('Signup error:', signUpError)
+        
         // Игнорируем ошибку отправки email, если пользователь создан
-        if (signUpError.message.includes('email') && data.user) {
+        const errorMessage = signUpError.message || String(signUpError)
+        if ((errorMessage.includes('email') || errorMessage.includes('Email')) && data.user) {
           // Пользователь создан, но email не отправлен - это нормально
           await ensureUserProfile(data.user.id, email, fullName)
           setSuccess(true)
@@ -56,6 +58,15 @@ export default function SignupPage() {
           }, 2000)
           return
         }
+        
+        // Если пользователь уже существует
+        if (errorMessage.includes('already') || errorMessage.includes('exists')) {
+          setError('An account with this email already exists. Please login instead.')
+          setLoading(false)
+          return
+        }
+        
+        // Другие ошибки
         throw signUpError
       }
 
@@ -73,15 +84,19 @@ export default function SignupPage() {
       }
     } catch (err: any) {
       console.error('Signup error:', err)
+      const errorMessage = err?.message || String(err) || 'An error occurred during signup'
+      
       // Игнорируем ошибки связанные с email, если регистрация прошла
-      if (err.message && err.message.includes('email') && !err.message.includes('already')) {
+      if (errorMessage.includes('email') && !errorMessage.includes('already') && !errorMessage.includes('exists')) {
         setSuccess(true)
         setTimeout(() => {
           router.push('/account')
           router.refresh()
         }, 2000)
+      } else if (errorMessage.includes('already') || errorMessage.includes('exists')) {
+        setError('An account with this email already exists. Please login instead.')
       } else {
-        setError(err.message || 'An error occurred during signup')
+        setError(errorMessage)
       }
     } finally {
       setLoading(false)
