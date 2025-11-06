@@ -36,9 +36,9 @@ export function ProductCard({ item }: ProductCardProps) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow group">
+    <div className="bg-[#1a1a1a] border border-[#8B0000]/20 rounded-lg overflow-hidden hover:border-[#8B0000]/40 transition-all group distressed-border">
       <Link href={`/products/${item.id}`}>
-        <div className="relative aspect-[3/4] bg-gray-100 overflow-hidden">
+        <div className="relative aspect-[3/4] bg-[#0a0a0a] overflow-hidden">
           {!imageError ? (
             <Image
               src={item.image_url}
@@ -49,13 +49,13 @@ export function ProductCard({ item }: ProductCardProps) {
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-400">
+            <div className="w-full h-full flex items-center justify-center text-[#F5F5DC]/40 font-serif">
               Image not available
             </div>
           )}
           {item.stock === 0 && (
-            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <span className="text-white font-semibold">Out of Stock</span>
+            <div className="absolute inset-0 bg-[#0a0a0a] bg-opacity-80 flex items-center justify-center">
+              <span className="text-[#8B0000] font-semibold font-serif">Out of Stock</span>
             </div>
           )}
         </div>
@@ -63,25 +63,25 @@ export function ProductCard({ item }: ProductCardProps) {
       
       <div className="p-4">
         <Link href={`/products/${item.id}`}>
-          <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-2">
+          <h3 className="text-lg font-semibold text-[#F5F5DC] mb-1 line-clamp-2 font-serif">
             {item.name}
           </h3>
         </Link>
         
         {item.purgaknit_categories && (
-          <p className="text-sm text-gray-500 mb-2">
+          <p className="text-sm text-[#8B0000]/70 mb-2 font-serif">
             {item.purgaknit_categories.name}
           </p>
         )}
         
         <div className="flex items-center justify-between mt-4">
-          <span className="text-xl font-bold text-gray-900">
+          <span className="text-xl font-bold text-[#8B0000] font-serif">
             €{item.price.toFixed(2)}
           </span>
           <button
             onClick={addToCart}
             disabled={item.stock === 0}
-            className="p-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="p-2 bg-[#8B0000] text-[#F5F5DC] rounded-md hover:bg-[#5C0000] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             aria-label="Add to cart"
           >
             <ShoppingCart className="w-5 h-5" />

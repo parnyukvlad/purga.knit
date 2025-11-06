@@ -38,18 +38,18 @@ export default async function ProductsPage({
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-gray-50 py-12">
+      <main className="min-h-screen bg-[#0a0a0a] py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Products</h1>
+          <h1 className="text-4xl font-bold text-[#8B0000] mb-8 font-serif italic grunge-text">Products</h1>
           
           {/* Category Filter */}
           <div className="mb-8 flex flex-wrap gap-2">
             <Link
               href="/products"
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors font-serif ${
                 !searchParams.category
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
+                  ? 'bg-[#8B0000] text-[#F5F5DC]'
+                  : 'bg-[#1a1a1a] text-[#F5F5DC]/70 hover:text-[#8B0000] border border-[#8B0000]/20'
               }`}
             >
               All
@@ -58,10 +58,10 @@ export default async function ProductsPage({
               <Link
                 key={category.id}
                 href={`/products?category=${category.slug}`}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors font-serif ${
                   searchParams.category === category.slug
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                    ? 'bg-[#8B0000] text-[#F5F5DC]'
+                    : 'bg-[#1a1a1a] text-[#F5F5DC]/70 hover:text-[#8B0000] border border-[#8B0000]/20'
                 }`}
               >
                 {category.name}
@@ -78,7 +78,7 @@ export default async function ProductsPage({
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-gray-600">No products found.</p>
+              <p className="text-[#F5F5DC]/70 font-serif">No products found.</p>
             </div>
           )}
         </div>

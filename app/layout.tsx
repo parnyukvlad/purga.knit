@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 
@@ -8,21 +8,27 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+  style: ["italic", "normal"],
+});
+
 export const metadata: Metadata = {
   title: {
-    default: "purga.knit - Handmade Knitted Items",
-    template: "%s | purga.knit",
+    default: "PURGA* - Handmade Knitted Items",
+    template: "%s | PURGA*",
   },
-  description: "Discover beautiful handmade knitted items from purga.knit. Unique, quality pieces crafted with care.",
+  description: "Discover beautiful handmade knitted items from PURGA*. Unique, quality pieces crafted with care.",
   keywords: ["knitted items", "handmade", "yarn", "Czech Republic", "e-commerce"],
-  authors: [{ name: "purga.knit" }],
+  authors: [{ name: "PURGA*" }],
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://purga.knit",
-    siteName: "purga.knit",
-    title: "purga.knit - Handmade Knitted Items",
-    description: "Discover beautiful handmade knitted items from purga.knit",
+    siteName: "PURGA*",
+    title: "PURGA* - Handmade Knitted Items",
+    description: "Discover beautiful handmade knitted items from PURGA*",
   },
   robots: {
     index: true,
@@ -37,7 +43,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
         <Providers>
           {children}
         </Providers>

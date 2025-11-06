@@ -1,26 +1,76 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0a0a;
+  --foreground: #f5f5dc;
+  --purga-red: #8B0000;
+  --purga-red-dark: #5C0000;
+  --purga-red-light: #A52A2A;
+  --purga-cream: #F5F5DC;
+  --purga-beige: #E8E8D3;
+  --purga-black: #0a0a0a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-purga-red: var(--purga-red);
+  --color-purga-red-dark: var(--purga-red-dark);
+  --color-purga-red-light: var(--purga-red-light);
+  --color-purga-cream: var(--purga-cream);
+  --color-purga-beige: var(--purga-beige);
+  --font-serif: var(--font-playfair);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+/* Grunge texture effect */
+.grunge-text {
+  position: relative;
+  display: inline-block;
+}
+
+.grunge-text::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(139, 0, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(139, 0, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 20%, rgba(139, 0, 0, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+/* Vintage paper texture */
+.vintage-bg {
+  background-color: var(--purga-cream);
+  background-image: 
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139, 0, 0, 0.03) 2px, rgba(139, 0, 0, 0.03) 4px),
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(139, 0, 0, 0.03) 2px, rgba(139, 0, 0, 0.03) 4px);
+}
+
+/* Distressed border effect */
+.distressed-border {
+  position: relative;
+}
+
+.distressed-border::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--purga-red);
+  opacity: 0.3;
+  background-image: 
+    radial-gradient(circle at 10% 20%, transparent 1px, var(--purga-red) 1px, var(--purga-red) 2px, transparent 2px),
+    radial-gradient(circle at 90% 80%, transparent 1px, var(--purga-red) 1px, var(--purga-red) 2px, transparent 2px);
+  background-size: 20px 20px;
+  pointer-events: none;
 }
