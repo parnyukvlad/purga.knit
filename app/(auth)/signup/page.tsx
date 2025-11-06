@@ -23,6 +23,15 @@ export default function SignupPage() {
     setSuccess(false)
 
     try {
+      // Проверяем подключение к Supabase
+      const { data: testData, error: testError } = await supabase.from('purgaknit_categories').select('id').limit(1)
+      if (testError && !testError.message.includes('permission')) {
+        console.error('Supabase connection error:', testError)
+        setError('Cannot connect to database. Please check your connection.')
+        setLoading(false)
+        return
+      }
+
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -38,6 +47,8 @@ export default function SignupPage() {
       if (signUpError) {
         // Игнорируем ошибку отправки email, если пользователь создан
         if (signUpError.message.includes('email') && data.user) {
+          // Пользователь создан, но email не отправлен - это нормально
+          await ensureUserProfile(data.user.id, email, fullName)
           setSuccess(true)
           setTimeout(() => {
             router.push('/account')
@@ -50,13 +61,18 @@ export default function SignupPage() {
 
       // Если пользователь создан успешно
       if (data.user) {
+        // Убеждаемся, что профиль создан в purgaknit_users
+        await ensureUserProfile(data.user.id, email, fullName)
         setSuccess(true)
         setTimeout(() => {
           router.push('/account')
           router.refresh()
         }, 2000)
+      } else {
+        setError('Failed to create user account')
       }
     } catch (err: any) {
+      console.error('Signup error:', err)
       // Игнорируем ошибки связанные с email, если регистрация прошла
       if (err.message && err.message.includes('email') && !err.message.includes('already')) {
         setSuccess(true)
@@ -69,6 +85,37 @@ export default function SignupPage() {
       }
     } finally {
       setLoading(false)
+    }
+  }
+
+  // Функция для создания профиля пользователя, если триггер не сработал
+  const ensureUserProfile = async (userId: string, userEmail: string, userName: string) => {
+    try {
+      // Проверяем, существует ли уже профиль
+      const { data: existingUser } = await supabase
+        .from('purgaknit_users')
+        .select('id')
+        .eq('id', userId)
+        .single()
+
+      // Если профиля нет, создаем его
+      if (!existingUser) {
+        const { error: insertError } = await supabase
+          .from('purgaknit_users')
+          .insert({
+            id: userId,
+            email: userEmail,
+            full_name: userName || null,
+          })
+
+        if (insertError) {
+          console.error('Error creating user profile:', insertError)
+          // Не выбрасываем ошибку, так как пользователь уже создан в auth.users
+        }
+      }
+    } catch (err) {
+      console.error('Error ensuring user profile:', err)
+      // Не выбрасываем ошибку, продолжаем работу
     }
   }
 
