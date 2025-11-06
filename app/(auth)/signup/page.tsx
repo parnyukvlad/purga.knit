@@ -42,61 +42,67 @@ export default function SignupPage() {
         },
       })
 
-      // Если есть ошибка, обрабатываем её
-      if (signUpError) {
-        console.error('Signup error:', signUpError)
-        
-        // Игнорируем ошибку отправки email, если пользователь создан
-        const errorMessage = signUpError.message || String(signUpError)
-        if ((errorMessage.includes('email') || errorMessage.includes('Email')) && data.user) {
-          // Пользователь создан, но email не отправлен - это нормально
-          await ensureUserProfile(data.user.id, email, fullName)
-          setSuccess(true)
-          setTimeout(() => {
-            router.push('/account')
-            router.refresh()
-          }, 2000)
-          return
-        }
+      console.log('Signup response:', { 
+        hasUser: !!data.user, 
+        userId: data.user?.id,
+        error: signUpError?.message,
+        errorCode: signUpError?.status 
+      })
+
+      // КРИТИЧНО: Проверяем, что пользователь действительно создан
+      if (!data.user) {
+        // Пользователь не создан - это критическая ошибка
+        const errorMessage = signUpError?.message || 'Failed to create user account'
+        console.error('User not created:', signUpError)
         
         // Если пользователь уже существует
-        if (errorMessage.includes('already') || errorMessage.includes('exists')) {
+        if (errorMessage.includes('already') || errorMessage.includes('exists') || errorMessage.includes('User already registered')) {
           setError('An account with this email already exists. Please login instead.')
-          setLoading(false)
-          return
+        } else {
+          setError(`Registration failed: ${errorMessage}. Please check your connection and try again.`)
         }
-        
-        // Другие ошибки
-        throw signUpError
+        setLoading(false)
+        return
       }
 
-      // Если пользователь создан успешно
-      if (data.user) {
-        // Убеждаемся, что профиль создан в purgaknit_users
-        await ensureUserProfile(data.user.id, email, fullName)
+      // Пользователь создан успешно - проверяем ошибки
+      if (signUpError) {
+        const errorMessage = signUpError.message || String(signUpError)
+        console.warn('Signup warning (user created but error occurred):', errorMessage)
+        
+        // Игнорируем только ошибки отправки email, если пользователь создан
+        if (errorMessage.includes('email') || errorMessage.includes('Email') || errorMessage.includes('confirmation')) {
+          console.log('Email error ignored - user was created successfully')
+          // Продолжаем создание профиля
+        } else {
+          // Другие ошибки - показываем, но продолжаем
+          console.error('Non-email error during signup:', signUpError)
+        }
+      }
+
+      // Убеждаемся, что профиль создан в purgaknit_users
+      const profileCreated = await ensureUserProfile(data.user.id, email, fullName)
+      
+      if (profileCreated) {
         setSuccess(true)
         setTimeout(() => {
           router.push('/account')
           router.refresh()
         }, 2000)
       } else {
-        setError('Failed to create user account')
+        // Профиль не создан, но пользователь создан - показываем предупреждение
+        setError('Account created but profile setup failed. Please contact support.')
+        console.error('Profile creation failed for user:', data.user.id)
       }
     } catch (err: any) {
-      console.error('Signup error:', err)
+      console.error('Signup error (catch block):', err)
       const errorMessage = err?.message || String(err) || 'An error occurred during signup'
       
-      // Игнорируем ошибки связанные с email, если регистрация прошла
-      if (errorMessage.includes('email') && !errorMessage.includes('already') && !errorMessage.includes('exists')) {
-        setSuccess(true)
-        setTimeout(() => {
-          router.push('/account')
-          router.refresh()
-        }, 2000)
-      } else if (errorMessage.includes('already') || errorMessage.includes('exists')) {
+      // Не показываем успех, если пользователь не создан
+      if (errorMessage.includes('already') || errorMessage.includes('exists')) {
         setError('An account with this email already exists. Please login instead.')
       } else {
-        setError(errorMessage)
+        setError(`Registration failed: ${errorMessage}. Please try again or contact support.`)
       }
     } finally {
       setLoading(false)
@@ -104,33 +110,57 @@ export default function SignupPage() {
   }
 
   // Функция для создания профиля пользователя, если триггер не сработал
-  const ensureUserProfile = async (userId: string, userEmail: string, userName: string) => {
+  const ensureUserProfile = async (userId: string, userEmail: string, userName: string): Promise<boolean> => {
     try {
+      console.log('Ensuring user profile for:', userId)
+      
       // Проверяем, существует ли уже профиль
-      const { data: existingUser } = await supabase
+      const { data: existingUser, error: selectError } = await supabase
         .from('purgaknit_users')
         .select('id')
         .eq('id', userId)
         .single()
 
+      if (selectError && selectError.code !== 'PGRST116') {
+        console.error('Error checking existing profile:', selectError)
+      }
+
       // Если профиля нет, создаем его
       if (!existingUser) {
-        const { error: insertError } = await supabase
+        console.log('Profile not found, creating new profile...')
+        const { data: insertedData, error: insertError } = await supabase
           .from('purgaknit_users')
           .insert({
             id: userId,
             email: userEmail,
             full_name: userName || null,
           })
+          .select()
 
         if (insertError) {
           console.error('Error creating user profile:', insertError)
-          // Не выбрасываем ошибку, так как пользователь уже создан в auth.users
+          console.error('Insert error details:', {
+            message: insertError.message,
+            code: insertError.code,
+            details: insertError.details,
+            hint: insertError.hint
+          })
+          return false
         }
+
+        if (insertedData && insertedData.length > 0) {
+          console.log('Profile created successfully:', insertedData[0])
+          return true
+        }
+      } else {
+        console.log('Profile already exists:', existingUser.id)
+        return true
       }
+
+      return false
     } catch (err) {
       console.error('Error ensuring user profile:', err)
-      // Не выбрасываем ошибку, продолжаем работу
+      return false
     }
   }
 
