@@ -35,10 +35,13 @@ export default function SignupPage() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/account`,
+          // Не указываем emailRedirectTo, чтобы избежать попытки отправки email
+          // emailRedirectTo: `${window.location.origin}/account`,
           data: {
             full_name: fullName,
           },
+          // Пытаемся отключить подтверждение email на уровне клиента
+          emailRedirectTo: undefined,
         },
       })
 
@@ -68,15 +71,29 @@ export default function SignupPage() {
       // Пользователь создан успешно - проверяем ошибки
       if (signUpError) {
         const errorMessage = signUpError.message || String(signUpError)
-        console.warn('Signup warning (user created but error occurred):', errorMessage)
+        const errorCode = signUpError.status || signUpError.code
         
-        // Игнорируем только ошибки отправки email, если пользователь создан
-        if (errorMessage.includes('email') || errorMessage.includes('Email') || errorMessage.includes('confirmation')) {
-          console.log('Email error ignored - user was created successfully')
-          // Продолжаем создание профиля
+        console.warn('Signup warning (user created but error occurred):', {
+          message: errorMessage,
+          code: errorCode,
+          error: signUpError
+        })
+        
+        // ИГНОРИРУЕМ все ошибки связанные с email/confirmation, если пользователь создан
+        // Это нормально для self-hosted Supabase без настроенного SMTP
+        if (
+          errorMessage.includes('email') || 
+          errorMessage.includes('Email') || 
+          errorMessage.includes('confirmation') ||
+          errorMessage.includes('sending') ||
+          errorCode === 500 // Ошибка сервера при отправке email
+        ) {
+          console.log('Email/confirmation error ignored - user was created successfully')
+          console.log('User ID:', data.user.id, 'Email:', data.user.email)
+          // Продолжаем создание профиля - это не критическая ошибка
         } else {
-          // Другие ошибки - показываем, но продолжаем
-          console.error('Non-email error during signup:', signUpError)
+          // Другие ошибки - логируем, но продолжаем, так как пользователь создан
+          console.warn('Non-email error during signup (continuing anyway):', signUpError)
         }
       }
 

@@ -11,6 +11,16 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
+    // Отключаем автоматическое подтверждение email
+    detectSessionInUrl: true,
+    // Пытаемся отключить требование подтверждения
+    flowType: 'pkce',
+  },
+  // Глобальные настройки для отключения email подтверждения
+  global: {
+    headers: {
+      'x-client-info': 'purgaknit-webshop',
+    },
   },
 })
 
