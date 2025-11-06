@@ -1,12 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables')
-}
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://bebachat.fun/'
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJlYmFjaGF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjE5ODgwMDAsImV4cCI6MjAzNzM0ODAwMH0.sEqr3uF7XMu1sIDAKNCzd_Ydarucz7TsKr7Tene5nog'
 
 export async function createServerClient() {
   const cookieStore = await cookies()
@@ -36,11 +32,7 @@ export async function createServerClient() {
 }
 
 export async function createServiceClient() {
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-  
-  if (!serviceRoleKey) {
-    throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY')
-  }
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJlYmFjaGF0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyMTk4ODAwMCwiZXhwIjoyMDM3MzQ4MDAwfQ.obJvxC0YYquRd-w1xweAbmegQcKhoNd7bASWOB95bK0'
   
   return createClient(supabaseUrl, serviceRoleKey, {
     auth: {
