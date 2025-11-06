@@ -1,7 +1,11 @@
 -- Добавить политику INSERT для purgaknit_users
 -- Это позволит пользователям создавать свои профили
 
-CREATE POLICY IF NOT EXISTS "Users can insert their own profile"
+-- Удаляем политику, если она существует
+DROP POLICY IF EXISTS "Users can insert their own profile" ON purgaknit_users;
+
+-- Создаем политику заново
+CREATE POLICY "Users can insert their own profile"
   ON purgaknit_users FOR INSERT
   WITH CHECK (auth.uid() = id);
 

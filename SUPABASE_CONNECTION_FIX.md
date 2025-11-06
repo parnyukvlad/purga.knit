@@ -62,6 +62,9 @@ WHERE id NOT IN (SELECT id FROM public.purgaknit_users);
 **ВАЖНО:** Выполните этот SQL, чтобы пользователи могли создавать свои профили:
 
 ```sql
+-- Удаляем политику, если она существует
+DROP POLICY IF EXISTS "Users can insert their own profile" ON purgaknit_users;
+
 -- Политика для создания профиля пользователем
 CREATE POLICY "Users can insert their own profile"
   ON purgaknit_users FOR INSERT
